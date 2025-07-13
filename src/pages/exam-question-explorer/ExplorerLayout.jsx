@@ -1,8 +1,8 @@
-import React from 'react'
+import { Outlet } from "react-router"
 
 const ExplorerLayout = () => {
   return (
-    <div>ExplorerLayout</div>
+    <Outlet />
   )
 }
 
