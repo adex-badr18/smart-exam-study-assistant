@@ -1,12 +1,23 @@
 import { useState } from "react";
+import { useGenerateQuestions } from "../../hooks/useGenerateQuestions";
+import { useToast } from "../../context/ToastProvider";
+
+import Spinner from "../../components/Spinner";
 
 const ExplorerIndex = () => {
+    const { addToast } = useToast();
+
     // State to hold the form data
     const [formData, setFormData] = useState({
         examType: "",
         subject: "",
         year: "",
-        numQuestions: 20, // Default number of questions
+        numQuestions: 10, // Default number of questions
+    });
+
+    // Initialize the custom hook to generate questions
+    const { mutate: generateQuestions, isPending } = useGenerateQuestions({
+        formData,
     });
 
     // Handle input changes and update state
@@ -21,13 +32,28 @@ const ExplorerIndex = () => {
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        // In a real application, you would pass formData to your API or prompt schema here.
-        console.log("Form Submitted:", formData);
-        alert(
-            "Form submitted! Check console for data. This data will be used to generate questions."
-        );
-        // Example of how you might call a function to generate questions:
-        // generateQuestions(formData);
+        if (isPending) return; // Prevent multiple submissions while loading
+
+        // Validate form data if necessary
+        if (!formData.examType || !formData.subject || !formData.year) {
+            // Add error handling if needed
+            addToast("Please fill in all required fields.", "error");
+            return;
+        }
+
+        // Call the mutation function to generate questions
+        // Note: The formData will be passed to the API call in the useGenerateQuestions
+        // hook, which will handle the API request and response.
+        // You can also add validation here if needed.
+        generateQuestions(formData);
+
+        // Reset form after submission if needed
+        // setFormData({
+        //     examType: "",
+        //     subject: "",
+        //     year: "",
+        //     numQuestions: 10,
+        // });
     };
 
     // Generate years for the dropdown (e.g., last 15 years)
@@ -62,7 +88,7 @@ const ExplorerIndex = () => {
                             name="examType"
                             value={formData.examType}
                             onChange={handleChange}
-                            required
+                            // required
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-base"
                         >
                             <option value="" disabled>
@@ -88,7 +114,7 @@ const ExplorerIndex = () => {
                             name="subject"
                             value={formData.subject}
                             onChange={handleChange}
-                            required
+                            // required
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-base"
                         >
                             <option value="" disabled>
@@ -120,7 +146,7 @@ const ExplorerIndex = () => {
                             name="year"
                             value={formData.year}
                             onChange={handleChange}
-                            required
+                            // required
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-base"
                         >
                             <option value="" disabled>
@@ -144,13 +170,13 @@ const ExplorerIndex = () => {
                         </label>
                         <input
                             type="number"
-                            min={20}
+                            min={10}
                             max={100}
                             id="numQuestions"
                             name="numQuestions"
                             value={formData.numQuestions}
                             onChange={handleChange}
-                            required
+                            // required
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-base"
                         />
                     </div>
@@ -158,11 +184,22 @@ const ExplorerIndex = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-lg
-                       hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className={`w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-lg ${
+                            isPending ? "animate-pulse" : ""
+                        } hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 shadow-md focus:outline-none 
+                       focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed`}
+                        disabled={isPending}
                     >
-                        Generate Questions
+                        {isPending ? (
+                            <Spinner
+                                secondaryText="Generating Questions..."
+                                spinnerSize="w-6 h-6"
+                                textClass="text-white"
+                                borderClass="border-white"
+                            />
+                        ) : (
+                            "Generate Questions"
+                        )}
                     </button>
                 </form>
             </div>
