@@ -1,45 +1,62 @@
-import axios from "axios";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai/web";
+import { Type } from "@google/genai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const key = "AIzaSyB2tXcY9yRN7LSvuPwNbMBaFP1rJuSBaMQ";
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 // Define the expected structure for a single question object
-const questionSchema = {
+const mockQuestionSchema = {
     type: Type.OBJECT,
     properties: {
-        questionText: { type: Type.STRING },
+        questionText: { type: Type.STRING }, // The question text
         options: {
             type: Type.ARRAY,
-            items: { type: Type.STRING },
+            items: { type: Type.STRING }, // The question text
             minItems: 4,
             maxItems: 4,
         },
-        answer: { type: Type.STRING },
-        explanation: { type: Type.STRING },
+        answer: { type: Type.STRING }, // The question text // The correct option text
+        explanation: { type: Type.STRING }, // The question text // Detailed explanation for the correct answer
+        // Optional properties for image
+        imageUrl: { type: Type.STRING }, // The question text // URL for the image (will be a placeholder)
+        imageAltText: { type: Type.STRING }, // The question text // Alt text describing the image
+        // New: optional topic tag for analytics
+        topicTag: { type: Type.STRING }, // The question text
     },
     required: ["questionText", "options", "answer", "explanation"],
-    propertyOrdering: ["questionText", "options", "answer", "explanation"],
+    propertyOrdering: [
+        "questionText",
+        "options",
+        "answer",
+        "explanation",
+        "imageUrl",
+        "imageAltText",
+        "topicTag",
+    ],
 };
 
-// Define schema for the array of questions
-const responseSchema = {
+// Define the schema for the array of questions
+const mockResponseSchema = {
     type: Type.ARRAY,
-    items: questionSchema,
+    items: mockQuestionSchema,
 };
 
 /**
- * Calls the Gemini API to generate exam questions based on the provided formData.
- * @param {Object} formData - Object containing examType, subject, year, numQuestions.
- * @returns {promise<Array<Object>>} - Promise resolving to an array of generated question objects.
+ * Calls the Gemini API to generate mock exam questions based on provided formData.
+ * @param {object} formData - Object containing examType, subject, numQuestions, topic.
+ * @returns {Promise<Array<object>>} - A promise that resolves to an array of question objects.
  */
-export const generateExamQuestions = async (formData) => {
-    const { examType, subject, year, numQuestions } = formData;
+export const generateMockExamQuestions = async (formData) => {
+    const { examType, subject, numQuestions, topic } = formData;
 
-    // MODIFIED PROMPT: More precise instructions for LaTeX in explanations
-    const prompt = `Generate ${numQuestions} multiple-choice questions for the ${examType} ${subject} exam from the year ${year}. Each question should have exactly 4 options. The options should have no labels (such as A. or (A) or A). For all mathematical expressions, use LaTeX syntax. Use \\(...\\) for inline mathematical expressions (e.g., "If \\(x^2 + y^2 = r^2\\)...") and $$...$$ for display mathematical expressions. 
-    If a question *requires* a diagram or image to be understood (e.g., geometry, diagrams, charts, graphs), **you MUST include an 'imageUrl' field and an 'imageAltText' field.** The 'imageUrl' should be a placeholder URL from 'https://placehold.co/600x400/cccccc/000000?text=**Descriptive+Image+Content**' where 'Descriptive+Image+Content' accurately describes the diagram needed (e.g., 'Triangle+ABC', 'Circuit+Diagram', 'Bar+Chart+Data'). The 'imageAltText' should also provide a clear, concise description of the diagram. If no image is needed, omit both 'imageUrl' and 'imageAltText' fields.
+    // Construct the prompt for the AI model
+    let prompt = `Generate ${numQuestions} multiple-choice questions (A-D) for a mock ${examType} ${subject} exam.`;
+
+    if (topic && topic !== "Any Topic") {
+        prompt += ` Focus specifically on the topic of "${topic}".`;
+    }
+
+    prompt += `If a question *requires* a diagram or image to be understood (e.g., geometry, diagrams, charts, graphs), **you MUST include an 'imageUrl' field and an 'imageAltText' field.** The 'imageUrl' should be a placeholder URL from 'https://placehold.co/600x400/cccccc/000000?text=**Descriptive+Image+Content**' where 'Descriptive+Image+Content' accurately describes the diagram needed (e.g., 'Triangle+ABC', 'Circuit+Diagram', 'Bar+Chart+Data'). The 'imageAltText' should also provide a clear, concise description of the diagram. If no image is needed, omit both 'imageUrl' and 'imageAltText' fields.
     For each question, provide the question text, all four options, the correct answer (as one of the options), a detailed explanation for the correct answer, and both imageUrl and imageAltText if applicable.
   
     All question texts should appear on a single line, and mathematical expressions found in the questionn text should be formatted using LaTeX syntax.
@@ -83,23 +100,28 @@ export const generateExamQuestions = async (formData) => {
     The output MUST be a JSON array of objects, strictly following this schema.`;
 
     try {
-        const result = await ai.models.generateContent({
+        // Call the Gemini API to generate questions
+        const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
-                responseSchema,
+                responseSchema: mockResponseSchema,
+                // maxOutputTokens: 1000, // Adjust as needed
+                // temperature: 0.7, // Adjust for creativity vs. accuracy
+                // topP: 0.9, // Adjust for diversity in responses
+                // stopSequences: ["\n"], // Stop generation at new line
             },
         });
 
         if (
-            result.candidates &&
-            result.candidates.length > 0 &&
-            result.candidates[0].content &&
-            result.candidates[0].content.parts &&
-            result.candidates[0].content.parts.length > 0
+            response.candidates &&
+            response.candidates.length > 0 &&
+            response.candidates[0].content &&
+            response.candidates[0].content.parts &&
+            response.candidates[0].content.parts.length > 0
         ) {
-            const jsonString = result.candidates[0].content.parts[0].text;
+            const jsonString = response.candidates[0].content.parts[0].text;
             const questionsJson = JSON.parse(jsonString);
 
             // Validate the structure of the generated questions
@@ -108,23 +130,6 @@ export const generateExamQuestions = async (formData) => {
                     "Invalid response format: Expected an array of questions."
                 );
             }
-
-            // parsedJson.forEach((q, index) => {
-            //     // CHANGED: Check for 'answer' property instead of 'correctAnswer'
-            //     if (
-            //         !q.questionText ||
-            //         !Array.isArray(q.options) ||
-            //         q.options.length !== 4 ||
-            //         !q.answer ||
-            //         !q.explanation
-            //     ) {
-            //         console.warn(
-            //             `Question ${index} has an invalid structure or missing 'answer' property:`,
-            //             q
-            //         );
-            //         // Optionally, you could filter out invalid questions or throw a more specific error
-            //     }
-            // });
 
             return questionsJson.map((q) => ({
                 questionText: q.questionText || "No question text available",

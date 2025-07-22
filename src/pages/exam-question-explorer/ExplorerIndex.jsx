@@ -47,7 +47,7 @@ const ExplorerIndex = () => {
         // You can also add validation here if needed.
         generateQuestions(formData);
 
-        // Reset form after submission if needed
+        // Reset form after submission
         // setFormData({
         //     examType: "",
         //     subject: "",

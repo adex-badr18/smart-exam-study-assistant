@@ -1,8 +1,8 @@
-import React from 'react'
+import { Outlet } from "react-router"
 
 const MockExamLayout = () => {
   return (
-    <div>MockExamLayout</div>
+    <Outlet />
   )
 }
 
