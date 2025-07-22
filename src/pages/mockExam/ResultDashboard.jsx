@@ -182,8 +182,8 @@ const ResultDashboard = () => {
     }, []);
 
     const handleStartNewExam = useCallback(() => {
-        navigate('/mock-exam')
-    }, [navigate])
+        navigate("/mock-exam");
+    }, [navigate]);
 
     // AI Strengths & Weaknesses Logic (Placeholder for now)
     useEffect(() => {
@@ -286,16 +286,46 @@ const ResultDashboard = () => {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    {Object.entries(metricsCardData).map(([key, value]) => (
-                        <div className="bg-green-50 p-4 rounded-lg text-center">
-                            <p className="text-lg text-gray-700">
-                                {formatTitle(key)}
-                            </p>
-                            <p className="text-3xl font-bold text-green-600">
-                                {value}
-                            </p>
-                        </div>
-                    ))}
+                    {Object.entries(metricsCardData).map(([key, value]) => {
+                        let bgColorClass = "";
+                        let textColorClass = "";
+
+                        if (key === "totalScore") {
+                            bgColorClass = "bg-blue-50";
+                            textColorClass = "text-blue-600";
+                        } else if (key === "accuracy") {
+                            bgColorClass = "bg-purple-50";
+                            textColorClass = "text-purple-600";
+                        } else if (key === "totalTimeSpent") {
+                            bgColorClass = "bg-yellow-50";
+                            textColorClass = "text-yellow-600";
+                        } else if (key === "correctAnswers") {
+                            bgColorClass = "bg-green-50";
+                            textColorClass = "text-green-600";
+                        } else if (key === "incorrectAnswers") {
+                            bgColorClass = "bg-red-50";
+                            textColorClass = "text-red-600";
+                        } else if (key === "unanswered") {
+                            bgColorClass = "bg-orange-50";
+                            textColorClass = "text-orange-600";
+                        }
+
+                        return (
+                            <div
+                            key={key}
+                                className={`${bgColorClass} p-4 rounded-lg text-center`}
+                            >
+                                <p className="text-lg text-gray-700">
+                                    {formatTitle(key)}
+                                </p>
+                                <p
+                                    className={`text-3xl font-bold ${textColorClass}`}
+                                >
+                                    {value}
+                                </p>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <p className="text-lg text-gray-700 text-center">
