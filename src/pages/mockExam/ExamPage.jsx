@@ -9,7 +9,7 @@ const ExamPage = () => {
     const location = useLocation();
     const { questions, formData } = location.state || {};
 
-    // console.log("ExamPage questions:", questions);
+    console.log("ExamPage questions:", questions);
     // console.log("ExamPage formData:", formData);
 
     // States for exam progress and selected answers

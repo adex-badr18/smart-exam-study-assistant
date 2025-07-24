@@ -21,9 +21,9 @@ const mockQuestionSchema = {
         imageUrl: { type: Type.STRING }, // The question text // URL for the image (will be a placeholder)
         imageAltText: { type: Type.STRING }, // The question text // Alt text describing the image
         // New: optional topic tag for analytics
-        topicTag: { type: Type.STRING }, // The question text
+        topicTag: { type: Type.STRING }, // The question topic
     },
-    required: ["questionText", "options", "answer", "explanation"],
+    required: ["questionText", "options", "answer", "explanation", "topicTag"],
     propertyOrdering: [
         "questionText",
         "options",
@@ -101,6 +101,24 @@ export const generateMockExamQuestions = async (formData) => {
 
     prompt += ` Each question must have exactly 4 options. **IMPORTANT: Options MUST NOT include any labels like "A.", "(A)", or "A" within the option text itself.** For all mathematical expressions, use LaTeX syntax. Use \\(...\\) for inline mathematical expressions (e.g., "If \\(x^2 + y^2 = r^2\\)...") and $$...$$ for display mathematical expressions that are **equations, formulas, or calculations** and should be on their own line (e.g., "The formula is: $$E=mc^2$$").
   
+        If a question or its explanation requires data to be presented in a table, **you MUST format the table using LaTeX's \\tabular environment.** Ensure proper alignment and use \\hline for horizontal rules and | for vertical rules where appropriate. For example, a simple data table should look like this:        
+        \\begin{tabular}{|c|c|c|c|} 
+        \\hline
+        Col1 & Col2 & Col2 & Col3 \\\\
+        \\hline
+        1 & 6 & 87837 & 787 \\\\ 
+        \\hline
+        2 & 7 & 78 & 5415 \\\\
+        \\hline
+        3 & 545 & 778 & 7507 \\\\
+        \\hline
+        4 & 545 & 18744 & 7560 \\\\
+        \\hline
+        5 & 88 & 788 & 6344 \\\\
+        \\hline
+        \\end{tabular}
+        Ensure all LaTeX commands within the table are properly escaped if necessary for JSON embedding.
+
         IMPORTANT: In the 'explanation' field, general explanatory sentences or definitions should be clearly separated by paragraph breaks (use double newlines for new paragraphs). Each significant **mathematical step, equation, or formula** should be presented on a new line and enclosed in display math delimiters ($$...). General explanatory sentences or definitions should NOT be enclosed in $$...$$ delimiters. For example, instead of:
         "Producers are organisms that produce their own food, primarily through photosynthesis, using light energy and inorganic substances.
         $$Autotrophs are organisms that can produce their own food, making them the primary producers in most ecosystems.$$
@@ -119,7 +137,17 @@ export const generateMockExamQuestions = async (formData) => {
         Decomposers break down dead organic matter, recycling nutrients back into the ecosystem."
 
         If a question *requires* a diagram or image to be understood (e.g., geometry, diagrams, charts, graphs), **you MUST include an 'imageUrl' field and an 'imageAltText' field.** The 'imageUrl' should be a placeholder URL from 'https://placehold.co/600x400/cccccc/000000?text=**Descriptive+Image+Content**' where 'Descriptive+Image+Content' accurately describes the diagram needed (e.g., 'Triangle+ABC', 'Circuit+Diagram', 'Bar+Chart+Data'). The 'imageAltText' should also provide a clear, concise description of the diagram. If no image is needed, omit both 'imageUrl' and 'imageAltText' fields.
-        For each question, provide the question text, all four options, the correct answer (as one of the options), a detailed explanation for the correct answer, and a 'topicTag' field indicating the specific sub-topic the question belongs to (e.g., "Algebra", "Ecology", "Waves").
+        For each question, provide the question text, all four options, the correct answer (as one of the options), a detailed explanation for the correct answer, and **crucially, a 'topicTag' field indicating the specific sub-topic the question belongs to (e.g., "Algebra", "Ecology", "Waves"). This 'topicTag' is mandatory and MUST BE INCLUDED FOR EVERY QUESTION.**
+
+        Here is an example of a complete question object, including 'topicTag':
+        {
+            "questionText": "What is the capital of France?",
+            "options": ["Berlin", "Madrid", "Paris", "Rome"],
+            "answer": "Paris",
+            "explanation": "Paris is the capital and most populous city of France. It is located on the River Seine.",
+            "topicTag": "Political Geography"
+        }
+
         The output MUST be a JSON array of objects, strictly following this schema.
   `;
 
