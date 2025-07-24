@@ -15,6 +15,7 @@ import Spinner from "../../components/Spinner";
 import ReviewQuestionCard from "./components/ReviewQuestionCard";
 
 // Assuming you'll create these later: useReviewExplanation and useStrengthsWeaknesses hooks
+import { useStrengthsWeaknesses } from "../../hooks/useStrengthsWeaknesses";
 
 const ResultDashboard = () => {
     const navigate = useNavigate();
@@ -35,11 +36,19 @@ const ResultDashboard = () => {
     const [isExplanationLoading, setIsExplanationLoading] = useState(false);
 
     // States for strengths and weaknesses (will be populated by AI hook later)
-    const [strengthsWeaknesses, setStrengthsWeaknesses] = useState({
-        strengths: [],
-        weaknesses: [],
-    });
-    const [isSWLoading, setIsSWLoading] = useState(false);
+    // const [strengthsWeaknesses, setStrengthsWeaknesses] = useState({
+    //     strengths: [],
+    //     weaknesses: [],
+    // });
+    // const [isSWLoading, setIsSWLoading] = useState(false);
+
+    // Use the strengths and weaknesses hook
+    const {
+        mutate: generateSW,
+        data: swData,
+        isPending: isSWLoading,
+        isError: isSWError,
+    } = useStrengthsWeaknesses();
 
     // Data Processing for result and performance metrics
     const calculateMetrics = useCallback(() => {
@@ -187,56 +196,30 @@ const ResultDashboard = () => {
 
     // AI Strengths & Weaknesses Logic (Placeholder for now)
     useEffect(() => {
-        const fetchStrengthsWeaknesses = async () => {
-            setIsSWLoading(true);
-
-            try {
-                // Call the API to generate strengths and weaknesses
-
-                // Mocking AI response for now
-                await new Promise((resolve) => setTimeout(resolve, 2000)); //Simulate API call
-                setStrengthsWeaknesses({
-                    strengths: [
-                        "Strong in Algebra (if applicable)",
-                        "Good time management on simpler questions.",
-                    ],
-                    weaknesses: [
-                        "Needs improvement in Geometry (if applicable)",
-                        "Struggles with complex word problems.",
-                        "Spends too much time on difficult questions.",
-                    ],
-                });
-            } catch (error) {
-                console.error(
-                    "Error generating strengths and weaknesses:",
-                    error
-                );
-                setStrengthsWeaknesses({
-                    strengths: ["Could not generate insights."],
-                    weaknesses: ["Please try again later."],
-                });
-            } finally {
-                setIsSWLoading(false);
-            }
-        };
-
-        // Only fetxh if questions exists and we haven't already loaded it or are loading
         if (
             questions &&
             questions.length > 0 &&
             !isSWLoading &&
-            strengthsWeaknesses.strengths.length === 0
+            !swData &&
+            !isSWError
         ) {
-            fetchStrengthsWeaknesses();
+            generateSW({
+                examType: formData.examType,
+                subject: formData.subject,
+                totalScore: metrics.totalScore,
+                totalQuestions: questions.length,
+                performanceByTopic: metrics.performanceByTopic,
+                totalTimeSpent: metrics.totalTimeSpent,
+            });
         }
     }, [
         questions,
         formData,
-        metrics.totalScore,
-        metrics.performanceByTopic,
-        metrics.totalTimeSpent,
-        strengthsWeaknesses.strengths.length,
+        metrics,
         isSWLoading,
+        isSWError,
+        swData,
+        generateSW,
     ]);
 
     // If no questions are passed, redirect to the explorer index
@@ -312,7 +295,7 @@ const ResultDashboard = () => {
 
                         return (
                             <div
-                            key={key}
+                                key={key}
                                 className={`${bgColorClass} p-4 rounded-lg text-center`}
                             >
                                 <p className="text-lg text-gray-700">
@@ -393,48 +376,49 @@ const ResultDashboard = () => {
                                 borderClass="border-gray-800"
                             />
                         </div>
+                    ) : isSWError ? (
+                        <div className="">
+                            Failed to load insights. Please try again.
+                        </div>
                     ) : (
                         <>
-                            {strengthsWeaknesses.strengths.length > 0 && (
+                            {swData?.strengths?.length > 0 && (
                                 <div className="mb-4">
                                     <h3 className="text-xl font-semibold text-green-700 mb-2">
                                         Strengths:
                                     </h3>
                                     <ul className="list-disc list-inside text-gray-700 space-y-1">
-                                        {strengthsWeaknesses.strengths.map(
-                                            (s, index) => (
-                                                <li key={index} className="">
-                                                    {s}
-                                                </li>
-                                            )
-                                        )}
+                                        {swData?.strengths.map((s, index) => (
+                                            <li key={index} className="">
+                                                {s}
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             )}
-                            {strengthsWeaknesses.weaknesses.length > 0 && (
+                            {swData?.weaknesses?.length > 0 && (
                                 <div className="mb-4">
                                     <h3 className="text-xl font-semibold text-red-700 mb-2">
                                         Weaknesses:
                                     </h3>
                                     <ul className="list-disc list-inside text-gray-700 space-y-1">
-                                        {strengthsWeaknesses.weaknesses.map(
-                                            (w, index) => (
-                                                <li key={index} className="">
-                                                    {w}
-                                                </li>
-                                            )
-                                        )}
+                                        {swData?.weaknesses?.map((w, index) => (
+                                            <li key={index} className="">
+                                                {w}
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             )}
 
-                            {strengthsWeaknesses.strengths.length === 0 &&
-                                strengthsWeaknesses.weaknesses.length === 0 && (
-                                    <p className="text-gray-600 text-center">
-                                        No specific strengths or weaknesses
-                                        identified yet.
-                                    </p>
-                                )}
+                            {(!swData ||
+                                (swData?.strengths?.length === 0 &&
+                                    swData?.weaknesses?.length === 0)) && (
+                                <p className="text-gray-600 text-center">
+                                    No specific strengths or weaknesses
+                                    identified yet.
+                                </p>
+                            )}
                         </>
                     )}
                 </div>

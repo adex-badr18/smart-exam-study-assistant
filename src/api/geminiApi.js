@@ -1,5 +1,4 @@
-import axios from "axios";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai/web";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const key = "AIzaSyB2tXcY9yRN7LSvuPwNbMBaFP1rJuSBaMQ";
