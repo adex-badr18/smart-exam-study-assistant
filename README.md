@@ -1,8 +1,8 @@
-# ExamPrep AI: Intelligent Exam Preparation Platform
+# SmartExamPrep: Intelligent Exam Preparation Platform
 
 ## Project Overview
 
-ExamPrep AI is an interactive web application designed to help students prepare for national examinations by providing AI-generated practice questions and mock exam simulations. Leveraging the power of Google's Gemini AI, the platform offers a dynamic learning experience, allowing users to explore past exam questions, take timed mock tests, and receive detailed performance analytics and explanations.
+SmartExamPrep is an interactive web application designed to help students prepare for national examinations by providing AI-generated practice questions and mock exam simulations. Leveraging the power of Google's Gemini AI, the platform offers a dynamic learning experience, allowing users to explore past exam questions, take timed mock tests, and receive detailed performance analytics and explanations.
 
 ## Features
 
@@ -72,7 +72,7 @@ ExamPrep AI is an interactive web application designed to help students prepare 
 
 * **AI Integration:**
 
-    * [Google Gemini API](https://ai.google.dev/models/gemini) (via `@google/generative-ai` SDK)
+    * [Google Gemini API](https://ai.google.dev/models/gemini) (via `@google/genai` library)
 
 * **Environment Management:**
 
@@ -92,8 +92,8 @@ To set up and run this project locally, follow these steps:
 
 1.  **Clone the Repository (Hypothetical):**
     ```bash
-    git clone [https://github.com/your-username/exam-prep-ai.git](https://github.com/your-username/exam-prep-ai.git)
-    cd exam-prep-ai
+    git clone [git@github.com:adex-badr18/smart-exam-study-assistant.git](git@github.com:adex-badr18/smart-exam-study-assistant.git)
+    cd smart-exam-study-assistant
     ```
 
 2.  **Install Dependencies:**
@@ -125,12 +125,13 @@ To set up and run this project locally, follow these steps:
 1.  **Home Page:** Upon launching the application, you'll see the main landing page with an overview of the "Exam Question Explorer" and "Mock Exam" features.
 
 2.  **Exam Question Explorer:**
-    * Scroll down to the "Explore Past Exam Questions" section.
+    * Click "Exam Explorer" menu on the navigation bar.
     * Select your desired exam type, subject, year, and number of questions.
     * Click "Generate Questions" to view and review questions with explanations.
+    * Click "End Session" button to terminate the practice session.
 
 3.  **Mock Exam:**
-    * Scroll down to the "Mock Exam Feature" section.
+    * Click "Mock Exam" menu on the navigation bar.
     * Select your exam type, subject, number of questions, and an optional specific topic.
     * Click "Start Mock Exam" to begin a timed session.
     * Navigate between questions, select answers, and use the question grid for quick jumps.
@@ -143,39 +144,7 @@ To set up and run this project locally, follow these steps:
     * (Future: Utilize AI-powered insights for strengths and weaknesses, and on-demand explanations.)
     * Click "Start New Mock Exam" to return to the mock exam form.
 
-## Project Structure (Key Files)
-
-.
-├── public/
-├── src/
-│   ├── api/
-│   │   ├── geminiApi.js             # API calls for Exam Explorer questions
-│   │   ├── mockExamApi.js           # API calls for Mock Exam questions (including topicTag)
-│   │   └── strengthsWeaknessesApi.js # NEW: API calls for AI strengths/weaknesses
-│   ├── components/
-│   │   ├── ExamQuestionExplorerForm.jsx # Form for explorer
-│   │   ├── FeatureStepsCardGrid.jsx # Reusable component for step cards
-│   │   ├── MockExamForm.jsx         # Form for mock exam
-│   │   ├── Navbar.jsx               # Navigation bar
-│   │   ├── ReviewQuestionCard.jsx   # NEW: Optimized component for review questions
-│   │   └── Toast.jsx                # Toast notification system
-│   ├── hooks/
-│   │   ├── useGenerateMockExam.js   # TanStack Query hook for mock exam generation
-│   │   ├── useGenerateQuestions.js  # TanStack Query hook for explorer generation
-│   │   └── useStrengthsWeaknesses.js # NEW: TanStack Query hook for strengths/weaknesses
-│   ├── pages/
-│   │   ├── QuestionsPage.jsx        # Display page for explorer questions
-│   │   ├── MockExamPage.jsx         # Interactive mock exam page (with timer)
-│   │   └── MockExamResultsPage.jsx  # NEW: Results and review page
-│   ├── App.js                       # Main application component, handles routing
-│   └── main.jsx                     # Entry point for React application
-├── .env                             # Environment variables (e.g., VITE_GEMINI_API_KEY)
-├── package.json                     # Project dependencies and scripts
-└── vite.config.js                   # Vite configuration
-
 ## Future Enhancements
-
-* **Full AI Integration:** Implement actual API calls for AI-generated strengths/weaknesses and on-demand question explanations.
 
 * **User Authentication:** Implement user login/registration to personalize experiences and save progress.
 
@@ -192,6 +161,10 @@ To set up and run this project locally, follow these steps:
 ## Contributing
 
 Contributions are welcome! If you have suggestions for improvements or find any issues, please feel free to open an issue or submit a pull request.
+
+## Deployment
+
+Visit [SmartExamPrep](https://smart-exam-study-assistant.vercel.app/) for a live demo of the platform.
 
 ## License
 
