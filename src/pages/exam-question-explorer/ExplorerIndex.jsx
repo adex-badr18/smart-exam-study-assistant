@@ -9,9 +9,9 @@ const ExplorerIndex = () => {
 
     // State to hold the form data
     const [formData, setFormData] = useState({
-        examType: "",
-        subject: "",
-        year: "",
+        examType: "WAEC",
+        subject: "Physics",
+        year: "2020",
         numQuestions: 10, // Default number of questions
     });
 

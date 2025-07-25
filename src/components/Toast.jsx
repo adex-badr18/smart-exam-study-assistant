@@ -6,8 +6,8 @@ const Toast = ({ toasts, removeToast }) => {
             {toasts.map((toast) => (
                 <div
                     key={toast.id}
-                    className={`p-4 rounded-lg shadow-lg text-white flex items-center justify-between min-w-[250px] max-w-sm 
-                        ${toast.type === "success" ? "bg-green-500" : ""} 
+                    className={`p-4 rounded-lg shadow-lg text-white font-semibold flex items-center justify-between min-w-[250px] max-w-sm 
+                        ${toast.type === "success" ? "bg-green-800" : ""} 
                         ${toast.type === "error" ? "bg-red-500" : ""}
                         ${toast.type === "info" ? "bg-blue-500" : ""}
                         ${toast.type === "warning" ? "bg-yellow-500" : ""}`}

@@ -101,7 +101,7 @@ export const generateExamQuestions = async (formData) => {
         Decomposers break down dead organic matter, recycling nutrients back into the ecosystem."
 
         If a question *requires* a diagram or image to be understood (e.g., geometry, diagrams, charts, graphs), **you MUST include an 'imageUrl' field and an 'imageAltText' field.** The 'imageUrl' should be a placeholder URL from 'https://placehold.co/600x400/cccccc/000000?text=**Descriptive+Image+Content**' where 'Descriptive+Image+Content' accurately describes the diagram needed (e.g., 'Triangle+ABC', 'Circuit+Diagram', 'Bar+Chart+Data'). The 'imageAltText' should also provide a clear, concise description of the diagram. If no image is needed, omit both 'imageUrl' and 'imageAltText' fields.
-        For each question, provide the question text, all four options, the correct answer (as one of the options), and a detailed explanation for the correct answer. The output MUST be a JSON array of objects, strictly following this schema.`;
+        For each question, provide the question text on a single line using LaTex to render mathematical expressions within the question text, all four options, the correct answer (as one of the options), and a detailed explanation for the correct answer. The output MUST be a JSON array of objects, strictly following this schema.`;
 
     try {
         const result = await ai.models.generateContent({

@@ -30,14 +30,14 @@ const QuestionCard = memo(
         `;
 
         const answerContentHtml = `
-            <div className="bg-green-50 text-green-800 p-3 rounded-lg mb-3">
-                <p className="font-semibold">
+            <div class="bg-green-50 text-green-800 p-3 rounded-lg mb-3">
+                <p class="font-semibold">
                     Correct Answer: ${q.answer || "No answer provided"}
                 </p>
             </div>
-            <div className="bg-blue-50 text-blue-800 p-3 rounded-lg">
-                <p className="font-semibold">Explanation:</p>
-                <p className="mt-1">
+            <div class="bg-blue-50 text-blue-800 p-3 rounded-lg">
+                <p class="font-semibold">Explanation:</p>
+                <p class="mt-1">
                     ${q.explanation || "No explanation provided"}
                 </p>
             </div>
@@ -106,7 +106,7 @@ const QuestionCard = memo(
                 <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out ${
                         isAnswerRevealed
-                            ? "max-h-[2000px] opacity-100"
+                            ? "max-h-[20000px] opacity-100"
                             : "max-h-0 opacity-0"
                     }`}
                 >

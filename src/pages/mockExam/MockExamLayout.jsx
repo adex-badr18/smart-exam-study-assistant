@@ -1,9 +1,11 @@
-import { Outlet } from "react-router"
+import { Outlet } from "react-router";
 
 const MockExamLayout = () => {
-  return (
-    <Outlet />
-  )
-}
+    return (
+        <div className="bg-gray-50">
+            <Outlet />
+        </div>
+    );
+};
 
-export default MockExamLayout
+export default MockExamLayout;

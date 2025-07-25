@@ -4,10 +4,10 @@ import Spinner from "../../components/Spinner";
 
 const MockExamIndex = () => {
     const [formData, setFormData] = useState({
-        examType: "",
-        subject: "",
+        examType: "UTME",
+        subject: "Mathematics",
         numQuestions: 5,
-        topic: "",
+        topic: "Trigonometry",
     });
 
     const { mutate, isPending } = useGenerateMockExam();

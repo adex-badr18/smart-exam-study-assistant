@@ -69,7 +69,7 @@ const GeneratedQuestions = memo(() => {
 
     // Render the generated questions
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-28 bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-5 min-h-screen">
             <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">
                 Practice Questions
             </h1>
