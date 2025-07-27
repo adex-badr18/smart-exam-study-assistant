@@ -288,7 +288,7 @@ const ExamPage = () => {
             </h1>
 
             <div
-                className={`fixed top-30 right-16 z-50 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 text-xl font-bold ${
+                className={`fixed top-30 right-20 z-50 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 text-xl font-bold ${
                     totalTimeleft <= 20
                         ? "bg-red-200 text-red-600"
                         : "bg-green-200 text-green-800"
