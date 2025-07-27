@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, ScrollRestoration } from "react-router";
 import heroImg from "../assets/hero-img.png";
 
 import HeroSection from "../components/home/HeroSection";
@@ -15,6 +15,8 @@ const Home = () => {
 
             {/* Mock Exam Section */}
             <MockExamFeatures />
+
+            <ScrollRestoration />
         </div>
     );
 };
