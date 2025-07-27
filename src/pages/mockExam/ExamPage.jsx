@@ -45,7 +45,7 @@ const ExamPage = () => {
             case "NECO":
                 return 5; // 60 secs per question
             case "UTME":
-                return 10; // 90 secs per question
+                return 30; // 90 secs per question
             default:
                 return 10; // defaults to 60 secs
         }

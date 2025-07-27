@@ -28,15 +28,7 @@ const ScrollToLocation = ({
         );
 
         if (hasPropsChanged) {
-            const targetElement = document.querySelector(targetSelector);
-
-            if (targetElement) {
-                targetElement.scrollIntoView({ behavior });
-            } else {
-                console.warn(
-                    `ScrollToLocation: Target element not found for selector "${targetSelector}"`
-                );
-            }
+            window.scrollTo({ top: 205, behavior });
         }
 
         prevDependenciesRef.current = dependencies;
