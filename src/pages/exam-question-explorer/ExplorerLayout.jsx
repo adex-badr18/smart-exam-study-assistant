@@ -1,11 +1,12 @@
-import { Outlet } from "react-router"
+import { Outlet, ScrollRestoration } from "react-router";
 
 const ExplorerLayout = () => {
-  return (
-    <div className="bg-gray-50">
-    <Outlet />
-    </div>
-  )
-}
+    return (
+        <div className="bg-gray-50">
+            <Outlet />
+            <ScrollRestoration />
+        </div>
+    );
+};
 
-export default ExplorerLayout
+export default ExplorerLayout;

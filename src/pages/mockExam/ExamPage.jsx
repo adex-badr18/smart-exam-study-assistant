@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, ScrollRestoration } from "react-router";
 import { MathJax } from "better-react-mathjax";
 import { createPortal } from "react-dom";
 import QuestionDisplay from "./QuestionDisplay";
+import { TimerIcon } from "../../components/icons";
+import ScrollToLocation from "../../components/ScrollToLocation";
 
 const ExamPage = () => {
     const navigate = useNavigate();
@@ -41,11 +43,11 @@ const ExamPage = () => {
         switch (examType) {
             case "WAEC":
             case "NECO":
-                return 60; // 60 secs per question
+                return 5; // 60 secs per question
             case "UTME":
-                return 90; // 90 secs per question
+                return 10; // 90 secs per question
             default:
-                return 60; // defaults to 60 secs
+                return 10; // defaults to 60 secs
         }
     });
 
@@ -280,107 +282,126 @@ const ExamPage = () => {
     const selectedAnswerIndex = selectedAnswers[currentQuestionIndex];
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50 min-h-screen">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50 min-h-screen">
             <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
                 Mock Exam Session
             </h1>
 
-            {/* Exam Info & Timer */}
-            <div className="bg-blue-100 text-blue-800 p-4 rounded-lg shadow-md mb-8 flex flex-col sm:flex-row justify-between items-center">
-                <p className="text-lg font-medium mb-2 sm:mb-0">
+            <div
+                className={`fixed top-30 right-16 z-50 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 text-xl font-bold ${
+                    totalTimeleft <= 20
+                        ? "bg-red-200 text-red-600"
+                        : "bg-green-200 text-green-800"
+                }`}
+            >
+                <TimerIcon />
+                {Math.floor(totalTimeleft / 60)
+                    .toString()
+                    .padStart(2, "0")}
+                :{(totalTimeleft % 60).toString().padStart(2, "0")}
+            </div>
+
+            {/* Exam Info */}
+            <div className="bg-blue-100 text-blue-800 p-4 text-lg rounded-lg shadow-md mb-8 flex flex-col sm:flex-row justify-between items-center">
+                <p className="">
                     <span className="font-semibold">Subject:</span>{" "}
-                    {formData.subject || "N/A"} |{" "}
-                    <span className="font-semibold">Question:</span>{" "}
-                    {currentQuestionIndex + 1} / {questions?.length}
-                    {formData.topic && formData.topic !== "Any Topic" && (
-                        <>
-                            {" "}
-                            | <span className="font-semibold">Topic:</span>{" "}
-                            {formData.topic}
-                        </>
-                    )}
+                    {formData.subject || "N/A"}
                 </p>
 
-                <div className="text-xl font-bold text-red-600">
-                    Total Time Left:{" "}
-                    {Math.floor(totalTimeleft / 60)
-                        .toString()
-                        .padStart(2, "0")}
-                    :{(totalTimeleft % 60).toString().padStart(2, "0")}
-                </div>
-            </div>
+                <p className="">
+                    <span className="font-semibold">Question:</span>{" "}
+                    {currentQuestionIndex + 1} / {questions?.length}
+                </p>
 
-            {/* Question Navigation Grid */}
-            <div className="bg-white p-4 rounded-lg shadow-md mb-8 overflow-x-auto whitespace-nowrap">
-                <div className="inline-flex space-x-2 pb-2">
-                    {questions.map((_, index) => {
-                        const isAnswered = selectedAnswers[index] !== null;
-                        const isCurrent = index === currentQuestionIndex;
-
-                        return (
-                            <button
-                                key={index}
-                                onClick={() => handleQuestionJump(index)}
-                                className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold ${
-                                    isCurrent
-                                        ? "bg-blue-600 text-white ring-2 ring-blue-400" // Current question
-                                        : isAnswered
-                                        ? "bg-green-500 text-white hover:bg-green-600" // Answered
-                                        : "bg-gray-200 text-gray-800 hover:bg-gray-300" // Unanswered
-                                } transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                    isCurrent
-                                        ? "ring-blue-500"
-                                        : isAnswered
-                                        ? "ring-green-400"
-                                        : "ring-gray-300"
-                                }`}
-                                title={
-                                    isAnswered
-                                        ? `Question ${index + 1} (Answered)`
-                                        : `Question ${index + 1} (Unanswered)`
-                                }
-                            >
-                                {index + 1}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Current Question Display */}
-            <QuestionDisplay
-                question={currentQuestion}
-                currentQuestionIndex={currentQuestionIndex}
-                selectedAnswerIndex={selectedAnswerIndex}
-                handleAnswerSelect={handleAnswerSelect}
-            />
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
-                <button
-                    onClick={handlePreviousQuestion}
-                    disabled={currentQuestionIndex === 0}
-                    className="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Previous
-                </button>
-
-                {currentQuestionIndex < questions?.length - 1 ? (
-                    <button
-                        onClick={handleNextQuestion}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Next
-                    </button>
-                ) : (
-                    <button
-                        onClick={() => setShowEndExamModal(true)}
-                        className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Submit Exam
-                    </button>
+                {formData.topic && formData.topic !== "Any Topic" && (
+                    <p>
+                        <span className="font-semibold">Topic:</span>{" "}
+                        {formData.topic}
+                    </p>
                 )}
             </div>
+
+            <ScrollToLocation
+                dependencies={[currentQuestionIndex]}
+                targetSelector="question-card"
+            >
+                {/* Question Navigation Grid */}
+                <div
+                    className="bg-white p-4 rounded-lg shadow-md mb-8 overflow-x-auto whitespace-nowrap"
+                    id="question-card"
+                >
+                    <div className="inline-flex space-x-2 pb-2">
+                        {questions.map((_, index) => {
+                            const isAnswered = selectedAnswers[index] !== null;
+                            const isCurrent = index === currentQuestionIndex;
+
+                            return (
+                                <button
+                                    key={index}
+                                    onClick={() => handleQuestionJump(index)}
+                                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold ${
+                                        isCurrent
+                                            ? "bg-blue-600 text-white ring-2 ring-blue-400" // Current question
+                                            : isAnswered
+                                            ? "bg-green-500 text-white hover:bg-green-600" // Answered
+                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300" // Unanswered
+                                    } transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                        isCurrent
+                                            ? "ring-blue-500"
+                                            : isAnswered
+                                            ? "ring-green-400"
+                                            : "ring-gray-300"
+                                    }`}
+                                    title={
+                                        isAnswered
+                                            ? `Question ${index + 1} (Answered)`
+                                            : `Question ${
+                                                  index + 1
+                                              } (Unanswered)`
+                                    }
+                                >
+                                    {index + 1}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Current Question Display */}
+                <QuestionDisplay
+                    question={currentQuestion}
+                    currentQuestionIndex={currentQuestionIndex}
+                    selectedAnswerIndex={selectedAnswerIndex}
+                    handleAnswerSelect={handleAnswerSelect}
+                />
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-8">
+                    <button
+                        onClick={handlePreviousQuestion}
+                        disabled={currentQuestionIndex === 0}
+                        className="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+
+                    {currentQuestionIndex < questions?.length - 1 ? (
+                        <button
+                            onClick={handleNextQuestion}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Next
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setShowEndExamModal(true)}
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Submit Exam
+                        </button>
+                    )}
+                </div>
+            </ScrollToLocation>
 
             {/* End Exam Confirmation Modal */}
             {showEndExamModal &&
@@ -414,6 +435,8 @@ const ExamPage = () => {
                     </div>,
                     document.body
                 )}
+
+            <ScrollRestoration />
         </div>
     );
 };

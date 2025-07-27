@@ -13,6 +13,20 @@ import {
 import { formatTitle } from "../../utils/formatting";
 import Spinner from "../../components/Spinner";
 import ReviewQuestionCard from "./components/ReviewQuestionCard";
+import {
+    TotalScoreIcon,
+    TimerIcon,
+    UnansweredIcon,
+    CorrectAnswersIcon,
+    IncorrectAnswersIcon,
+    StrengthIcon,
+    WeaknessIcon,
+    AccurracyIcon,
+    ChartIcon,
+    ReviewIcon,
+    ScaleIcon,
+    SummaryIcon,
+} from "../../components/icons";
 
 // Assuming you'll create these later: useReviewExplanation and useStrengthsWeaknesses hooks
 import { useStrengthsWeaknesses } from "../../hooks/useStrengthsWeaknesses";
@@ -133,16 +147,36 @@ const ResultDashboard = () => {
 
     // Metrics Card Data
     const metricsCardData = {
-        totalScore: `${metrics.totalScore} / ${questions.length}`,
-        accuracy: `${metrics.accuracy}%`,
-        totalTimeSpent: `${Math.floor(metrics.totalTimeSpent / 60)
-            .toString()
-            .padStart(2, "0")}:${(metrics.totalTimeSpent % 60)
-            .toString()
-            .padStart(2, "0")}`,
-        correctAnswers: metrics.correctAnswers,
-        incorrectAnswers: metrics.incorrectAnswers,
-        unanswered: metrics.unansweredQuestions,
+        score: {
+            value: `${metrics.totalScore} / ${questions.length}`,
+            icon: <TotalScoreIcon className="w-6" />,
+            descr: "Your Total Score"
+        },
+        accuracy: { value: `${metrics.accuracy}%`, icon: <AccurracyIcon className="w-8 -mt-1.5" />, descr: "Performance Accuracy" },
+        time: {
+            value: `${Math.floor(metrics.totalTimeSpent / 60)
+                .toString()
+                .padStart(2, "0")}:${(metrics.totalTimeSpent % 60)
+                .toString()
+                .padStart(2, "0")}`,
+            icon: <TimerIcon className="w-6" />,
+            descr: "Total Time Spent"
+        },
+        correct: {
+            value: metrics.correctAnswers,
+            icon: <CorrectAnswersIcon className="w-6" />,
+            descr: "Correct Answers"
+        },
+        incorrect: {
+            value: metrics.incorrectAnswers,
+            icon: <IncorrectAnswersIcon className="w-6" />,
+            descr: "Incorrect Answers"
+        },
+        unanswered: {
+            value: metrics.unansweredQuestions,
+            icon: <UnansweredIcon className="w-6" />,
+            descr: "Unanswered Questions"
+        },
     };
 
     // AI Explanation Logic (Placeholder for now)
@@ -264,49 +298,74 @@ const ResultDashboard = () => {
 
             {/* Exam Summary */}
             <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    Summary
-                </h2>
+                <div className="flex justify-center items-center gap-2 text-gray-800 mb-6">
+                    <SummaryIcon />
+                    <h2 className="text-2xl font-bold text-center">Summary</h2>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    {Object.entries(metricsCardData).map(([key, value]) => {
+                    {Object.entries(metricsCardData).map(([key, obj]) => {
                         let bgColorClass = "";
                         let textColorClass = "";
+                        let borderClass = "";
 
-                        if (key === "totalScore") {
+                        if (key === "score") {
                             bgColorClass = "bg-blue-50";
                             textColorClass = "text-blue-600";
+                            borderClass = "border-blue-600";
                         } else if (key === "accuracy") {
                             bgColorClass = "bg-purple-50";
                             textColorClass = "text-purple-600";
-                        } else if (key === "totalTimeSpent") {
+                            borderClass = "border-purple-600";
+                        } else if (key === "time") {
                             bgColorClass = "bg-yellow-50";
                             textColorClass = "text-yellow-600";
-                        } else if (key === "correctAnswers") {
+                            borderClass = "border-yellow-600";
+                        } else if (key === "correct") {
                             bgColorClass = "bg-green-50";
                             textColorClass = "text-green-600";
-                        } else if (key === "incorrectAnswers") {
+                            borderClass = "border-green-600";
+                        } else if (key === "incorrect") {
                             bgColorClass = "bg-red-50";
                             textColorClass = "text-red-600";
+                            borderClass = "border-red-600";
                         } else if (key === "unanswered") {
                             bgColorClass = "bg-orange-50";
                             textColorClass = "text-orange-600";
+                            borderClass = "border-orange-600";
                         }
 
                         return (
-                            <div
-                                key={key}
-                                className={`${bgColorClass} p-4 rounded-lg text-center`}
-                            >
-                                <p className="text-lg text-gray-700">
+                            <div className={`p-4 space-y-4 rounded-lg border ${borderClass} ${bgColorClass} shadow-md`}>
+                                <h4 className="text-gray-700 font-medium">
                                     {formatTitle(key)}
-                                </p>
-                                <p
+                                </h4>
+                                <h3
                                     className={`text-3xl font-bold ${textColorClass}`}
                                 >
-                                    {value}
-                                </p>
+                                    {obj.value}
+                                </h3>
+                                <div className={`flex items-center gap-2 ${textColorClass}`}>
+                                    {obj.icon}
+                                    <span className="text-sm text-grey">{obj.descr}</span>
+                                </div>
                             </div>
+                            // <div
+                            //     key={key}
+                            //     className={`flex flex-col items-center gap-2 ${bgColorClass} p-4 rounded-lg text-center`}
+                            // >
+                            //     <p className={`${textColorClass}`}>
+                            //         {obj.icon}
+                            //     </p>
+                            //     <p
+                            //         className={`text-3xl font-bold ${textColorClass}`}
+                            //     >
+                            //         {obj.value}
+                            //     </p>
+                            //     <p className="text-lg text-gray-700 font-medium">
+                            //         {formatTitle(key)}
+                            //     </p>
+                            // </div>
                         );
                     })}
                 </div>
@@ -329,9 +388,12 @@ const ResultDashboard = () => {
             {/* Performance Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                        Answer Distribution
-                    </h2>
+                    <div className="flex justify-center items-center gap-2 text-gray-800 mb-6">
+                        <ChartIcon />
+                        <h2 className="text-2xl font-bold text-center">
+                            Answer Distribution
+                        </h2>
+                    </div>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
@@ -366,9 +428,12 @@ const ResultDashboard = () => {
 
                 {/* Strengths and Weaknesses (AI-generated) */}
                 <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                        Strengths & Weaknesses
-                    </h2>
+                    <div className="flex justify-center items-center gap-4 text-gray-800 mb-6">
+                        <ScaleIcon />
+                        <h2 className="text-2xl font-bold text-center">
+                            Strengths & Weaknesses
+                        </h2>
+                    </div>
                     {isSWLoading ? (
                         <div className="text-center text-gray-600">
                             <Spinner
@@ -382,11 +447,12 @@ const ResultDashboard = () => {
                         </div>
                     ) : (
                         <>
-                            {swData?.strengths?.length > 0 && (
-                                <div className="mb-4">
-                                    <h3 className="text-xl font-semibold text-green-700 mb-2">
-                                        Strengths:
-                                    </h3>
+                            <div className="mb-4">
+                                <h3 className="flex items-center gap-2 text-xl font-semibold text-green-700 mb-2">
+                                    <StrengthIcon />{" "}
+                                    <span className="">Strengths:</span>
+                                </h3>
+                                {swData?.strengths?.length > 0 ? (
                                     <ul className="list-disc list-inside text-gray-700 space-y-1">
                                         {swData?.strengths.map((s, index) => (
                                             <li key={index} className="">
@@ -394,13 +460,18 @@ const ResultDashboard = () => {
                                             </li>
                                         ))}
                                     </ul>
-                                </div>
-                            )}
-                            {swData?.weaknesses?.length > 0 && (
-                                <div className="mb-4">
-                                    <h3 className="text-xl font-semibold text-red-700 mb-2">
-                                        Weaknesses:
-                                    </h3>
+                                ) : (
+                                    <p className="text-gray-700">
+                                        No strengths observed.
+                                    </p>
+                                )}
+                            </div>
+                            <div className="mb-4">
+                                <h3 className="flex items-center gap-2 text-xl font-semibold text-red-700 mb-2">
+                                    <WeaknessIcon />{" "}
+                                    <span className="">Weaknesses:</span>
+                                </h3>
+                                {swData?.weaknesses?.length > 0 ? (
                                     <ul className="list-disc list-inside text-gray-700 space-y-1">
                                         {swData?.weaknesses?.map((w, index) => (
                                             <li key={index} className="">
@@ -408,8 +479,12 @@ const ResultDashboard = () => {
                                             </li>
                                         ))}
                                     </ul>
-                                </div>
-                            )}
+                                ) : (
+                                    <p className="text-gray-700">
+                                        No weaknesses observed.
+                                    </p>
+                                )}
+                            </div>
 
                             {(!swData ||
                                 (swData?.strengths?.length === 0 &&
@@ -426,9 +501,12 @@ const ResultDashboard = () => {
 
             {/* Question Review Section */}
             <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                    Question Review
-                </h2>
+                <div className="flex justify-center items-center gap-2 text-gray-800 mb-6">
+                    <ReviewIcon />
+                    <h2 className="text-2xl font-bold text-center">
+                        Question Review
+                    </h2>
+                </div>
                 <div className="space-y-8">
                     {questions.map((q, index) => (
                         <ReviewQuestionCard
